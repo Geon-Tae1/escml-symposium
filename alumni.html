@@ -151,7 +151,13 @@ window.addEventListener('DOMContentLoaded', function () {
     try { sessionStorage.setItem('sym_ct', '1'); } catch (_) {}
     if (window.SYM_CONTACT) { rows(); return; }
     var s = document.createElement('script');
-    s.src = 'contacts.js?v=2'; s.onload = rows; s.onerror = rows;
+    s.src = 'contacts.js?v=3';
+    s.onload = function () {
+      try { window.SYM_CONTACT = JSON.parse(decodeURIComponent(escape(atob(window.SYM_CT_B64)))); }
+      catch (_) { window.SYM_CONTACT = {}; }
+      rows();
+    };
+    s.onerror = rows;
     document.head.appendChild(s);
   }
 
