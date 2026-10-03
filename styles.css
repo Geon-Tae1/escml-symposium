@@ -389,3 +389,24 @@ table.t tr.off:hover td{opacity:1}
   .idea .no{font-size:24px;right:16px;top:13px}
   .step p,.step .note{font-size:14px}
 }
+
+/* 목록·표처럼 화면보다 긴 영역은 등장 애니메이션을 걸지 않는다.
+   조건이 안 맞으면 통째로 안 보이는 사고가 난다. */
+.tbl-wrap.reveal,#orgs.reveal,#rows,.picker.reveal,.months.reveal,.ideas .idea,.steps .step{
+  opacity:1!important;transform:none!important}
+
+/* 휴대폰에서 카드 높이 줄이기 — 135장을 끝까지 내리는 수고를 덜기 위해 */
+@media (max-width:760px){
+  table.t tr{position:relative;padding:12px 14px}
+  /* 과정 배지는 이름 줄 오른쪽 위로 */
+  table.t td[data-l="과정"]{position:absolute;top:12px;right:14px;padding:0;display:block}
+  table.t td[data-l="과정"]::before{content:none}
+  table.t td.c-name{padding:0 64px 7px 0;margin-bottom:7px}
+  table.t td.c-name .nm{font-size:16px}
+  /* 값이 없는 칸은 아예 감춘다 */
+  table.t td[data-empty]{display:none}
+  table.t td{padding:3px 0}
+  table.t td.c-att{padding-top:8px}
+  .seg button{padding:8px 0}
+  table.t tr.grp{margin:16px 0 8px;padding:7px 13px}
+}

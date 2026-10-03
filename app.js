@@ -69,16 +69,24 @@
     if (menu && menu.classList.contains('open')) placeMenu();
   }, { passive: true });
 
-  /* 스크롤 등장 효과 */
+  /* 스크롤 등장 효과
+     threshold 는 반드시 0 이어야 한다. 0.1 로 두면 화면보다 긴 요소 — 동문 명단처럼
+     카드가 100장 넘게 쌓인 표 — 는 10%가 한 번도 보이지 않아 영영 나타나지 않는다. */
+  function revealAll() {
+    document.querySelectorAll('.reveal:not(.in)').forEach(function (el) { el.classList.add('in'); });
+  }
   var els = document.querySelectorAll('.reveal:not(.in)');
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (en) {
       en.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-    }, { threshold: .1, rootMargin: '0px 0px -6% 0px' });
+    }, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
     els.forEach(function (el) { io.observe(el); });
+    /* 안전장치 — 무슨 이유로든 관찰이 동작하지 않으면 그냥 보여 준다 */
+    setTimeout(revealAll, 1500);
   } else {
-    els.forEach(function (el) { el.classList.add('in'); });
+    revealAll();
   }
+  window.SYMUI_revealAll = revealAll;
 
   /* ---- 공통 도우미 ---- */
   var W = window;
