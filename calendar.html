@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2027년 1 · 2월 달력 — 선양국 교수님 정년퇴임 기념 심포지엄</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="base.css?v=1">
+<link rel="stylesheet" href="styles.css?v=2">
+</head>
+<body data-page="calendar">
+<div id="site-header"></div>
+<main>
+
+<div class="page-head"><div class="strata"></div><div class="wrap page-head-in reveal">
+  <div class="eyebrow">달력</div>
+  <h1>2027년 1월 · 2월</h1>
+  <p>달력에 올릴 일정을 직접 고르십시오. 체크한 것만 아래 달력에 표시됩니다.
+     조사해 둔 학회와 소속기관 일정은 달력 아래에 그대로 붙여 두었습니다.</p>
+</div></div>
+
+<section class="section"><div class="wrap">
+
+  <div class="picker reveal">
+    <div class="picker-hd">
+      <b>달력에 표시할 일정</b>
+      <span class="pk-act">
+        <button class="btn btn-ghost btn-sm" type="button" id="pk-all">전체 선택</button>
+        <button class="btn btn-ghost btn-sm" type="button" id="pk-none">전체 해제</button>
+      </span>
+    </div>
+    <div id="picker" class="picker-body"></div>
+  </div>
+
+  <div class="legend reveal" style="margin-top:22px">
+    <span><b class="c-crit"></b>공휴일 · 학교 퇴임식</span>
+    <span><b class="c-warn"></b>주의가 필요한 일정</span>
+    <span><b class="c-info"></b>참고</span>
+    <span><b class="c-good"></b>우리 행사 후보</span>
+  </div>
+  <div class="months reveal" id="months"></div>
+
+  <div class="subhead reveal">학회 일정</div>
+  <p class="reveal" style="max-width:72ch;color:var(--ink-soft);margin:-6px 0 18px">
+    국내외 학회 24곳을 조사했습니다. 결론부터 적자면 <b>1 · 2월에 열리는 국내 배터리 · 전기화학 학회는 없습니다.</b>
+    실제 걸림돌은 설 연휴, CES, 기업 4분기 실적발표, 대학 학위수여식입니다.</p>
+  <div class="toolbar reveal">
+    <input type="search" id="q1" placeholder="학회 이름으로 찾기" aria-label="학회 검색">
+    <select id="f-kind" aria-label="구분"><option value="">전체</option></select>
+    <span class="count" id="c1"></span>
+  </div>
+  <div class="tbl-wrap reveal">
+    <table class="t"><thead><tr>
+      <th style="width:106px">구분</th><th style="width:220px">학회</th><th style="width:220px">일정</th>
+      <th style="width:170px">장소</th><th style="width:84px">확인</th><th>1 · 2월 충돌</th>
+    </tr></thead><tbody id="r1"></tbody></table>
+  </div>
+
+  <div class="subhead reveal">동문 소속기관 행사</div>
+  <p class="reveal" style="max-width:72ch;color:var(--ink-soft);margin:-6px 0 18px">
+    동문이 많이 속한 기관부터 적었습니다. 괄호 안 숫자는 그 기관에 있는 동문 수입니다.</p>
+  <div id="orgs" class="reveal"></div>
+
+  <p class="srcnote reveal">각 학회 공식 홈페이지와 기관 공시 · 보도자료에서 확인한 일정입니다. 확정이 아닌 건은 「추정」으로 적었습니다.
+    체크한 항목은 이 브라우저에 저장됩니다.</p>
+</div></section>
+
+</main>
+<div id="site-footer"></div>
+<script defer src="data.js?v=2"></script>
+<script defer src="app.js?v=2"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+  var D = window.SYM, el = window.SYMUI.el, fmt = window.SYMUI.fmt;
+  if (!D) return;
+  var KEY = 'escml_cal';
+  var DEFAULT = ['hyu-retire', 'newyear', 'seollal', 'samil'];
+
+  var on = null;
+  try { on = JSON.parse(localStorage.getItem(KEY)); } catch (_) {}
+  if (!Array.isArray(on)) on = DEFAULT.slice();
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(on)); } catch (_) {} }
+
+  /* 후보일은 항상 표시 */
+  var cands = D.cands.map(function (c, i) {
+    return { id: c.id, start: c.start, end: c.end, title: '★ 후보 ' + (i + 1) + ' · ' + c.label,
+             cat: '행사 후보', level: 'good', note: c.why };
+  });
+
+  function shown() {
+    return D.events.filter(function (e) { return on.indexOf(e.id) >= 0; }).concat(cands);
+  }
+
+  function month(y, mo, evs) {
+    var box = el('div', { class: 'month' }, [el('h3', {}, [y + '년 ' + mo + '월'])]);
+    var g = el('div', { class: 'cal' });
+    ['월', '화', '수', '목', '금', '토', '일'].forEach(function (w, i) {
+      g.appendChild(el('div', { class: 'dw' + (i === 6 ? ' sun' : '') }, [w]));
+    });
+    var lead = (new Date(y, mo - 1, 1).getDay() + 6) % 7;
+    for (var i = 0; i < lead; i++) g.appendChild(el('div', { class: 'day pad' }));
+    var last = new Date(y, mo, 0).getDate();
+    for (var d = 1; d <= last; d++) {
+      var iso = y + '-' + String(mo).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      var hits = evs.filter(function (e) { return iso >= e.start && iso <= (e.end || e.start); });
+      var isSun = new Date(y, mo - 1, d).getDay() === 0;
+      var fix = hits.some(function (e) { return e.level === 'good'; });
+      var cell = el('div', { class: 'day' + (isSun ? ' sun' : '') + (fix ? ' fix' : '') },
+        [el('div', { class: 'num' }, [String(d)])]);
+      hits.slice(0, 3).forEach(function (e) {
+        cell.appendChild(el('span', { class: 'sychip c-' + e.level, title: e.title }, [e.title]));
+      });
+      if (hits.length > 3) cell.appendChild(el('span', { class: 'sychip c-info' }, ['+' + (hits.length - 3)]));
+      g.appendChild(cell);
+    }
+    box.appendChild(g);
+    return box;
+  }
+
+  function draw() {
+    var evs = shown(), m = document.getElementById('months');
+    m.innerHTML = '';
+    m.appendChild(month(2027, 1, evs));
+    m.appendChild(month(2027, 2, evs));
+  }
+
+  /* 체크 목록 */
+  var pk = document.getElementById('picker');
+  D.events.forEach(function (e) {
+    var id = 'ck-' + e.id;
+    var cb = el('input', { type: 'checkbox', id: id });
+    cb.checked = on.indexOf(e.id) >= 0;
+    cb.addEventListener('change', function () {
+      var i = on.indexOf(e.id);
+      if (cb.checked) { if (i < 0) on.push(e.id); } else if (i >= 0) on.splice(i, 1);
+      save(); draw(); row.classList.toggle('on', cb.checked);
+    });
+    var span = e.end && e.end !== e.start ? fmt(e.start) + ' ~ ' + fmt(e.end) : fmt(e.start);
+    var row = el('label', { class: 'pkrow' + (cb.checked ? ' on' : ''), for: id }, [
+      cb,
+      el('span', { class: 'lv l-' + e.level }),
+      el('span', { class: 'ti' }, [e.title]),
+      el('span', { class: 'dt' }, [span])
+    ]);
+    pk.appendChild(row);
+  });
+  function setAll(v) {
+    on = v ? D.events.map(function (e) { return e.id; }) : [];
+    save();
+    D.events.forEach(function (e) {
+      var cb = document.getElementById('ck-' + e.id);
+      cb.checked = v; cb.closest('.pkrow').classList.toggle('on', v);
+    });
+    draw();
+  }
+  document.getElementById('pk-all').addEventListener('click', function () { setAll(true); });
+  document.getElementById('pk-none').addEventListener('click', function () { setAll(false); });
+  draw();
+
+  /* 학회 */
+  var kinds = [];
+  D.societies.forEach(function (s) { if (kinds.indexOf(s.kind) < 0) kinds.push(s.kind); });
+  var sel = document.getElementById('f-kind');
+  kinds.forEach(function (k) { sel.appendChild(el('option', { value: k }, [k])); });
+  var q = '', kind = '';
+  function soc() {
+    var tb = document.getElementById('r1'); tb.innerHTML = ''; var n = 0;
+    D.societies.forEach(function (s) {
+      if (kind && s.kind !== kind) return;
+      if (q && (s.name + ' ' + s.where).toLowerCase().indexOf(q.toLowerCase()) < 0) return;
+      n++;
+      tb.appendChild(el('tr', {}, [
+        el('td', {}, [el('span', { class: 'sypill' }, [s.kind])]),
+        el('td', {}, [el('span', { class: 'nm' }, [s.name])]),
+        el('td', { class: s.when ? '' : 'muted' }, [s.when || '미공지']),
+        el('td', { class: s.where ? '' : 'muted' }, [s.where || '—']),
+        el('td', {}, [el('span', { class: 'sypill' + (String(s.conf).indexOf('확정') === 0 ? ' ok' : '') }, [s.conf])]),
+        el('td', { class: String(s.hit).indexOf('해당 없음') === 0 ? 'muted' : '' }, [s.hit])
+      ]));
+    });
+    document.getElementById('c1').textContent = n + '곳';
+  }
+  document.getElementById('q1').addEventListener('input', function (e) { q = e.target.value; soc(); });
+  sel.addEventListener('change', function (e) { kind = e.target.value; soc(); });
+  soc();
+
+  /* 소속기관 */
+  var ob = document.getElementById('orgs');
+  D.orgs.forEach(function (o) {
+    var card = el('div', { class: 'card', style: 'margin-bottom:14px' }, [
+      el('h3', {}, [o.org, el('span', { class: 'orgn' }, ['동문 ' + o.n + '명'])])
+    ]);
+    var w = el('div', { class: 'tbl-wrap', style: 'margin-top:12px' });
+    var t = el('table', { class: 't' }, [el('thead', {}, [el('tr', {}, [
+      el('th', { style: 'width:190px' }, ['시기']), el('th', {}, ['행사']), el('th', { style: 'width:96px' }, ['확인'])])])]);
+    var tb = el('tbody', {});
+    (o.items || []).forEach(function (it) {
+      tb.appendChild(el('tr', {}, [
+        el('td', { class: 'syct' }, [it.when]),
+        el('td', {}, [it.what]),
+        el('td', {}, [el('span', { class: 'sypill' + (String(it.conf).indexOf('확정') === 0 ? ' ok' : '') }, [it.conf])])
+      ]));
+    });
+    t.appendChild(tb); w.appendChild(t); card.appendChild(w); ob.appendChild(card);
+  });
+});
+</script>
+</body>
+</html>
