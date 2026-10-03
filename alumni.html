@@ -6,7 +6,7 @@
 <title>동문 명단 — 선양국 교수님 정년퇴임 기념 심포지엄</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="base.css?v=1">
-<link rel="stylesheet" href="styles.css?v=4">
+<link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body data-page="alumni">
 <div id="site-header"></div>
@@ -22,6 +22,11 @@
 <section class="section"><div class="wrap">
 
   <div class="sum" id="sum"></div>
+
+  <div class="ask reveal">
+    바뀐 <b>소속 · 직책 · 연락처</b>나 빠진 분이 있으면 알려 주십시오. 바로 고치겠습니다.
+    &nbsp;—&nbsp; <a href="mailto:gtpark1@hanyang.ac.kr?subject=%EB%8F%99%EB%AC%B8%20%EB%AA%85%EB%8B%A8%20%EC%A0%95%EC%A0%95">gtpark1@hanyang.ac.kr</a> (한양대학교 박건태 교수)
+  </div>
 
   <div class="gate-sym reveal" id="gate">
     <div class="lk"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg></div>
@@ -65,8 +70,8 @@
 
 </main>
 <div id="site-footer"></div>
-<script defer src="data.js?v=4"></script>
-<script defer src="app.js?v=4"></script>
+<script defer src="data.js?v=5"></script>
+<script defer src="app.js?v=5"></script>
 <script>
 window.addEventListener('DOMContentLoaded', function () {
   // 주의 — 화면을 가리는 장치일 뿐 실제 보안이 아닙니다.
@@ -76,6 +81,9 @@ window.addEventListener('DOMContentLoaded', function () {
   var D = window.SYM, el = window.SYMUI.el;
   if (!D) return;
   var RANK = { 0: { k: 'phd', n: '박사' }, 1: { k: 'ms', n: '석사' }, 2: { k: 'cur', n: '재학생' } };
+  var SUB = ['박사 재학생', '석사 재학생', 'Post-Doc'];
+  function gkey(p) { return p.rank === 2 ? '2-' + (p.sub || 0) : String(p.rank); }
+  function gname(p) { return p.rank === 2 ? SUB[p.sub || 0] : RANK[p.rank].n; }
   var ATT = [['y', '참석'], ['m', '미정'], ['n', '불참']];
   var open = false, q = '', rank = '', att = '';
 
@@ -114,9 +122,10 @@ window.addEventListener('DOMContentLoaded', function () {
     var last = null, n = 0;
     list.forEach(function (p) {
       var R = RANK[p.rank] || { k: '', n: '' };
-      if (p.rank !== last) {
-        last = p.rank;
-        tb.appendChild(el('tr', { class: 'grp g-' + R.k }, [el('td', { colspan: '7' }, [R.n])]));
+      var gk = gkey(p);
+      if (gk !== last) {
+        last = gk;
+        tb.appendChild(el('tr', { class: 'grp g-' + R.k }, [el('td', { colspan: '7' }, [gname(p)])]));
       }
       n++;
       var ct = (open && window.SYM_CONTACT) ? (window.SYM_CONTACT[p.id] || {}) : {};
@@ -153,7 +162,7 @@ window.addEventListener('DOMContentLoaded', function () {
     try { sessionStorage.setItem('sym_ct', '1'); } catch (_) {}
     if (window.SYM_CONTACT) { rows(); return; }
     var s = document.createElement('script');
-    s.src = 'contacts.js?v=4';
+    s.src = 'contacts.js?v=5';
     s.onload = function () {
       try { window.SYM_CONTACT = JSON.parse(decodeURIComponent(escape(atob(window.SYM_CT_B64)))); }
       catch (_) { window.SYM_CONTACT = {}; }

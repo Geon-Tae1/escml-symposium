@@ -16,7 +16,8 @@
     box.appendChild(el('div', { class: 'row' + (i === 0 ? ' top' : '') }, [
       el('div', { class: 'sytag' }, [k.tag]),
       el('div', {}, [
-        el('div', { class: 'd' }, [k.label, el('span', { class: 'dow' }, [k.dow])]),
+        el('div', { class: 'd' }, [k.label, el('span', { class: 'dow' }, [k.dow]),
+          k.gap ? el('span', { class: 'gap' }, ['공식 퇴임식 ' + k.gap + '일 전']) : null]),
         el('div', { class: 'why' }, [k.why]),
         el('div', { class: 'risk' }, [el('b', {}, ['살펴볼 점 — ']), k.risk])
       ])

@@ -302,3 +302,12 @@ table.t tr.can td.ckcell{background:var(--sym-soft)}
 table.t tr.grp.g-off td{background:var(--wash);color:var(--muted);border-left:3px solid var(--line-strong)}
 table.t tr.off td{opacity:.62}
 table.t tr.off:hover td{opacity:1}
+
+.pick .gap{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--muted);
+  border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-weight:600;white-space:nowrap}
+.pick .row.top .gap{border-color:var(--sym-line);color:var(--sym)}
+.ask{border:1px dashed var(--sym-line);background:var(--sym-soft);border-radius:11px;padding:14px 18px;
+  font-size:14px;color:var(--ink-soft);line-height:1.6;margin:0 0 20px}
+.ask b{color:var(--sym-deep)}
+:root[data-theme="dark"] .ask b{color:var(--sym)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ask b{color:var(--sym)}}
