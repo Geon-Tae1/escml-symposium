@@ -6,7 +6,7 @@
 <title>2027년 1 · 2월 달력 — 선양국 교수님 정년퇴임 기념 심포지엄</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="base.css?v=1">
-<link rel="stylesheet" href="styles.css?v=2">
+<link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body data-page="calendar">
 <div id="site-header"></div>
@@ -15,15 +15,15 @@
 <div class="page-head"><div class="strata"></div><div class="wrap page-head-in reveal">
   <div class="eyebrow">달력</div>
   <h1>2027년 1월 · 2월</h1>
-  <p>달력에 올릴 일정을 직접 고르십시오. 체크한 것만 아래 달력에 표시됩니다.
-     조사해 둔 학회와 소속기관 일정은 달력 아래에 그대로 붙여 두었습니다.</p>
+  <p>달력에 올릴 일정을 직접 고르십시오. 아래 세 군데 — 주요 일정, 학회, 소속기관 행사 — 어디서든
+     체크하면 그 자리에서 달력에 올라갑니다.</p>
 </div></div>
 
 <section class="section"><div class="wrap">
 
   <div class="picker reveal">
     <div class="picker-hd">
-      <b>달력에 표시할 일정</b>
+      <b>주요 일정</b>
       <span class="pk-act">
         <button class="btn btn-ghost btn-sm" type="button" id="pk-all">전체 선택</button>
         <button class="btn btn-ghost btn-sm" type="button" id="pk-none">전체 해제</button>
@@ -37,13 +37,15 @@
     <span><b class="c-warn"></b>주의가 필요한 일정</span>
     <span><b class="c-info"></b>참고</span>
     <span><b class="c-good"></b>우리 행사 후보</span>
+    <span class="lg-count" id="lgc"></span>
   </div>
   <div class="months reveal" id="months"></div>
 
   <div class="subhead reveal">학회 일정</div>
   <p class="reveal" style="max-width:72ch;color:var(--ink-soft);margin:-6px 0 18px">
     국내외 학회 24곳을 조사했습니다. 결론부터 적자면 <b>1 · 2월에 열리는 국내 배터리 · 전기화학 학회는 없습니다.</b>
-    실제 걸림돌은 설 연휴, CES, 기업 4분기 실적발표, 대학 학위수여식입니다.</p>
+    실제 걸림돌은 설 연휴, CES, 기업 4분기 실적발표, 대학 학위수여식입니다.
+    1 · 2월에 걸리는 학회만 체크할 수 있습니다.</p>
   <div class="toolbar reveal">
     <input type="search" id="q1" placeholder="학회 이름으로 찾기" aria-label="학회 검색">
     <select id="f-kind" aria-label="구분"><option value="">전체</option></select>
@@ -51,14 +53,15 @@
   </div>
   <div class="tbl-wrap reveal">
     <table class="t"><thead><tr>
-      <th style="width:106px">구분</th><th style="width:220px">학회</th><th style="width:220px">일정</th>
-      <th style="width:170px">장소</th><th style="width:84px">확인</th><th>1 · 2월 충돌</th>
+      <th style="width:58px">달력</th><th style="width:100px">구분</th><th style="width:210px">학회</th>
+      <th style="width:210px">일정</th><th style="width:160px">장소</th><th style="width:80px">확인</th><th>1 · 2월 충돌</th>
     </tr></thead><tbody id="r1"></tbody></table>
   </div>
 
   <div class="subhead reveal">동문 소속기관 행사</div>
   <p class="reveal" style="max-width:72ch;color:var(--ink-soft);margin:-6px 0 18px">
-    동문이 많이 속한 기관부터 적었습니다. 괄호 안 숫자는 그 기관에 있는 동문 수입니다.</p>
+    동문이 많이 속한 기관부터 적었습니다. 괄호 안 숫자는 그 기관에 있는 동문 수입니다.
+    「1월 하순」처럼 범위로만 알려진 일정은 추정 구간으로 달력에 올라갑니다.</p>
   <div id="orgs" class="reveal"></div>
 
   <p class="srcnote reveal">각 학회 공식 홈페이지와 기관 공시 · 보도자료에서 확인한 일정입니다. 확정이 아닌 건은 「추정」으로 적었습니다.
@@ -67,8 +70,8 @@
 
 </main>
 <div id="site-footer"></div>
-<script defer src="data.js?v=2"></script>
-<script defer src="app.js?v=2"></script>
+<script defer src="data.js?v=3"></script>
+<script defer src="app.js?v=3"></script>
 <script>
 window.addEventListener('DOMContentLoaded', function () {
   var D = window.SYM, el = window.SYMUI.el, fmt = window.SYMUI.fmt;
@@ -80,15 +83,39 @@ window.addEventListener('DOMContentLoaded', function () {
   try { on = JSON.parse(localStorage.getItem(KEY)); } catch (_) {}
   if (!Array.isArray(on)) on = DEFAULT.slice();
   function save() { try { localStorage.setItem(KEY, JSON.stringify(on)); } catch (_) {} }
+  function has(id) { return on.indexOf(id) >= 0; }
+  function toggle(id, v) {
+    var i = on.indexOf(id);
+    if (v) { if (i < 0) on.push(id); } else if (i >= 0) on.splice(i, 1);
+    save();
+  }
+
+  /* 체크로 올릴 수 있는 항목 전체 — 주요 일정 + 학회 + 기관 행사 */
+  var EXTRA = [];
+  D.societies.forEach(function (s) {
+    if (!s.cal) return;
+    EXTRA.push({ id: s.id, start: s.cal.start, end: s.cal.end, level: 'warn',
+                 title: s.name + (s.cal.approx ? ' (추정)' : '') });
+  });
+  D.orgs.forEach(function (o) {
+    (o.items || []).forEach(function (it) {
+      if (!it.cal) return;
+      EXTRA.push({ id: it.id, start: it.cal.start, end: it.cal.end, level: 'info',
+                   title: o.org + ' — ' + it.what + (it.cal.approx ? ' (추정)' : '') });
+    });
+  });
+  var EXMAP = {}; EXTRA.forEach(function (e) { EXMAP[e.id] = e; });
 
   /* 후보일은 항상 표시 */
   var cands = D.cands.map(function (c, i) {
     return { id: c.id, start: c.start, end: c.end, title: '★ 후보 ' + (i + 1) + ' · ' + c.label,
-             cat: '행사 후보', level: 'good', note: c.why };
+             cat: '행사 후보', level: 'good' };
   });
 
   function shown() {
-    return D.events.filter(function (e) { return on.indexOf(e.id) >= 0; }).concat(cands);
+    var out = D.events.filter(function (e) { return has(e.id); });
+    EXTRA.forEach(function (e) { if (has(e.id)) out.push(e); });
+    return out.concat(cands);
   }
 
   function month(y, mo, evs) {
@@ -100,13 +127,13 @@ window.addEventListener('DOMContentLoaded', function () {
     var lead = (new Date(y, mo - 1, 1).getDay() + 6) % 7;
     for (var i = 0; i < lead; i++) g.appendChild(el('div', { class: 'day pad' }));
     var last = new Date(y, mo, 0).getDate();
-    for (var d = 1; d <= last; d++) {
-      var iso = y + '-' + String(mo).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    for (var dd = 1; dd <= last; dd++) {
+      var iso = y + '-' + String(mo).padStart(2, '0') + '-' + String(dd).padStart(2, '0');
       var hits = evs.filter(function (e) { return iso >= e.start && iso <= (e.end || e.start); });
-      var isSun = new Date(y, mo - 1, d).getDay() === 0;
+      var isSun = new Date(y, mo - 1, dd).getDay() === 0;
       var fix = hits.some(function (e) { return e.level === 'good'; });
       var cell = el('div', { class: 'day' + (isSun ? ' sun' : '') + (fix ? ' fix' : '') },
-        [el('div', { class: 'num' }, [String(d)])]);
+        [el('div', { class: 'num' }, [String(dd)])]);
       hits.slice(0, 3).forEach(function (e) {
         cell.appendChild(el('span', { class: 'sychip c-' + e.level, title: e.title }, [e.title]));
       });
@@ -122,32 +149,38 @@ window.addEventListener('DOMContentLoaded', function () {
     m.innerHTML = '';
     m.appendChild(month(2027, 1, evs));
     m.appendChild(month(2027, 2, evs));
+    document.getElementById('lgc').textContent =
+      '달력에 올린 일정 ' + (evs.length - cands.length) + '건 + 후보 ' + cands.length + '건';
   }
 
-  /* 체크 목록 */
+  /* 표 안의 체크 상자 */
+  function mkBox(id, dis) {
+    if (dis) return el('span', { class: 'muted', title: '1 · 2월에 걸리지 않아 달력에 올릴 수 없습니다' }, ['—']);
+    var cb = el('input', { type: 'checkbox', class: 'calbox', 'aria-label': '달력에 표시' });
+    cb.checked = has(id);
+    cb.addEventListener('change', function () { toggle(id, cb.checked); draw(); });
+    return cb;
+  }
+
+  /* 주요 일정 */
   var pk = document.getElementById('picker');
   D.events.forEach(function (e) {
     var id = 'ck-' + e.id;
     var cb = el('input', { type: 'checkbox', id: id });
-    cb.checked = on.indexOf(e.id) >= 0;
+    cb.checked = has(e.id);
     cb.addEventListener('change', function () {
-      var i = on.indexOf(e.id);
-      if (cb.checked) { if (i < 0) on.push(e.id); } else if (i >= 0) on.splice(i, 1);
-      save(); draw(); row.classList.toggle('on', cb.checked);
+      toggle(e.id, cb.checked); draw(); row.classList.toggle('on', cb.checked);
     });
     var span = e.end && e.end !== e.start ? fmt(e.start) + ' ~ ' + fmt(e.end) : fmt(e.start);
     var row = el('label', { class: 'pkrow' + (cb.checked ? ' on' : ''), for: id }, [
-      cb,
-      el('span', { class: 'lv l-' + e.level }),
-      el('span', { class: 'ti' }, [e.title]),
-      el('span', { class: 'dt' }, [span])
+      cb, el('span', { class: 'lv l-' + e.level }),
+      el('span', { class: 'ti' }, [e.title]), el('span', { class: 'dt' }, [span])
     ]);
     pk.appendChild(row);
   });
   function setAll(v) {
-    on = v ? D.events.map(function (e) { return e.id; }) : [];
-    save();
     D.events.forEach(function (e) {
+      toggle(e.id, v);
       var cb = document.getElementById('ck-' + e.id);
       cb.checked = v; cb.closest('.pkrow').classList.toggle('on', v);
     });
@@ -155,7 +188,6 @@ window.addEventListener('DOMContentLoaded', function () {
   }
   document.getElementById('pk-all').addEventListener('click', function () { setAll(true); });
   document.getElementById('pk-none').addEventListener('click', function () { setAll(false); });
-  draw();
 
   /* 학회 */
   var kinds = [];
@@ -169,7 +201,8 @@ window.addEventListener('DOMContentLoaded', function () {
       if (kind && s.kind !== kind) return;
       if (q && (s.name + ' ' + s.where).toLowerCase().indexOf(q.toLowerCase()) < 0) return;
       n++;
-      tb.appendChild(el('tr', {}, [
+      tb.appendChild(el('tr', { class: s.cal ? 'can' : '' }, [
+        el('td', { class: 'ckcell' }, [mkBox(s.id, !s.cal)]),
         el('td', {}, [el('span', { class: 'sypill' }, [s.kind])]),
         el('td', {}, [el('span', { class: 'nm' }, [s.name])]),
         el('td', { class: s.when ? '' : 'muted' }, [s.when || '미공지']),
@@ -192,10 +225,12 @@ window.addEventListener('DOMContentLoaded', function () {
     ]);
     var w = el('div', { class: 'tbl-wrap', style: 'margin-top:12px' });
     var t = el('table', { class: 't' }, [el('thead', {}, [el('tr', {}, [
-      el('th', { style: 'width:190px' }, ['시기']), el('th', {}, ['행사']), el('th', { style: 'width:96px' }, ['확인'])])])]);
+      el('th', { style: 'width:58px' }, ['달력']), el('th', { style: 'width:170px' }, ['시기']),
+      el('th', {}, ['행사']), el('th', { style: 'width:92px' }, ['확인'])])])]);
     var tb = el('tbody', {});
     (o.items || []).forEach(function (it) {
-      tb.appendChild(el('tr', {}, [
+      tb.appendChild(el('tr', { class: it.cal ? 'can' : '' }, [
+        el('td', { class: 'ckcell' }, [mkBox(it.id, !it.cal)]),
         el('td', { class: 'syct' }, [it.when]),
         el('td', {}, [it.what]),
         el('td', {}, [el('span', { class: 'sypill' + (String(it.conf).indexOf('확정') === 0 ? ' ok' : '') }, [it.conf])])
@@ -203,6 +238,8 @@ window.addEventListener('DOMContentLoaded', function () {
     });
     t.appendChild(tb); w.appendChild(t); card.appendChild(w); ob.appendChild(card);
   });
+
+  draw();
 });
 </script>
 </body>

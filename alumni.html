@@ -6,7 +6,7 @@
 <title>동문 명단 — 선양국 교수님 정년퇴임 기념 심포지엄</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="base.css?v=1">
-<link rel="stylesheet" href="styles.css?v=2">
+<link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body data-page="alumni">
 <div id="site-header"></div>
@@ -37,7 +37,7 @@
   </div>
 
   <div class="toolbar reveal" style="margin-top:24px">
-    <input type="search" id="q" placeholder="이름 · 소속으로 찾기" aria-label="검색">
+    <input type="search" id="q" placeholder="이름 · 소속 · 직책으로 찾기" aria-label="검색">
     <select id="f-rank" aria-label="과정">
       <option value="">전체 과정</option><option value="0">박사</option><option value="1">석사</option><option value="2">재학생</option>
     </select>
@@ -51,9 +51,9 @@
   <div class="tbl-wrap reveal">
     <table class="t">
       <thead><tr>
-        <th style="width:148px">이름</th><th style="width:84px">과정</th><th>소속</th>
-        <th class="ct-col" style="width:132px">휴대폰</th><th class="ct-col" style="width:200px">이메일</th>
-        <th style="width:168px">참석</th>
+        <th style="width:136px">이름</th><th style="width:72px">과정</th><th style="width:150px">소속</th><th style="width:92px">직책</th>
+        <th class="ct-col" style="width:124px">휴대폰</th><th class="ct-col">이메일</th>
+        <th style="width:184px">참석</th>
       </tr></thead>
       <tbody id="rows"></tbody>
     </table>
@@ -65,8 +65,8 @@
 
 </main>
 <div id="site-footer"></div>
-<script defer src="data.js?v=2"></script>
-<script defer src="app.js?v=2"></script>
+<script defer src="data.js?v=3"></script>
+<script defer src="app.js?v=3"></script>
 <script>
 window.addEventListener('DOMContentLoaded', function () {
   // 주의 — 화면을 가리는 장치일 뿐 실제 보안이 아닙니다.
@@ -108,14 +108,15 @@ window.addEventListener('DOMContentLoaded', function () {
       if (rank !== '' && String(p.rank) !== rank) return false;
       if (att) { var a = S[p.id] || '-'; if (a !== att) return false; }
       if (!q) return true;
-      return (p.name + ' ' + (p.en || '') + ' ' + (p.org || '')).toLowerCase().indexOf(q.toLowerCase()) >= 0;
+      return (p.name + ' ' + (p.en || '') + ' ' + (p.org || '') + ' ' + (p.title || ''))
+        .toLowerCase().indexOf(q.toLowerCase()) >= 0;
     });
     var last = null, n = 0;
     list.forEach(function (p) {
       var R = RANK[p.rank] || { k: '', n: '' };
       if (p.rank !== last) {
         last = p.rank;
-        tb.appendChild(el('tr', { class: 'grp g-' + R.k }, [el('td', { colspan: '6' }, [R.n])]));
+        tb.appendChild(el('tr', { class: 'grp g-' + R.k }, [el('td', { colspan: '7' }, [R.n])]));
       }
       n++;
       var ct = (open && window.SYM_CONTACT) ? (window.SYM_CONTACT[p.id] || {}) : {};
@@ -135,6 +136,7 @@ window.addEventListener('DOMContentLoaded', function () {
         el('td', {}, [el('span', { class: 'nm' }, [p.name]), p.en ? el('span', { class: 'en' }, [p.en]) : null]),
         el('td', {}, [el('span', { class: 'rk rk-' + R.k }, [p.deg || R.n])]),
         el('td', { class: p.org ? '' : 'muted' }, [p.org || '미확인']),
+        el('td', { class: p.title ? '' : 'muted' }, [p.title || '']),
         el('td', { class: 'syct ct-col' + (ct.tel ? '' : ' muted') }, [ct.tel || (open ? '—' : '')]),
         el('td', { class: 'syct ct-col' + (ct.mail ? '' : ' muted') },
           [ct.mail ? el('a', { href: 'mailto:' + ct.mail }, [ct.mail]) : (open ? '—' : '')]),
@@ -173,10 +175,10 @@ window.addEventListener('DOMContentLoaded', function () {
 
   document.getElementById('exp').addEventListener('click', function () {
     var NM = { y: '참석', m: '미정', n: '불참' };
-    var out = ['이름,과정,소속,참석여부'];
+    var out = ['이름,과정,소속,직책,참석여부'];
     D.people.forEach(function (p) {
       out.push(['"' + p.name + '"', '"' + (p.deg || '') + '"', '"' + (p.org || '') + '"',
-        '"' + (NM[S[p.id]] || '미회신') + '"'].join(','));
+        '"' + (p.title || '') + '"', '"' + (NM[S[p.id]] || '미회신') + '"'].join(','));
     });
     var blob = new Blob(['﻿' + out.join('\n')], { type: 'text/csv;charset=utf-8' });
     var a = document.createElement('a');
