@@ -311,3 +311,81 @@ table.t tr.off:hover td{opacity:1}
 .ask b{color:var(--sym-deep)}
 :root[data-theme="dark"] .ask b{color:var(--sym)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ask b{color:var(--sym)}}
+
+
+/* ============================================================
+   좁은 화면 — 표를 카드로 바꾼다
+   가로로 밀어서 봐야 하는 표는 휴대폰에서 사실상 못 읽는다.
+   ============================================================ */
+@media (max-width:760px){
+  body{font-size:15.5px}
+  .page-head-in{padding-block:40px 32px}
+  .page-head h1{font-size:clamp(25px,7.4vw,32px);letter-spacing:-.015em}
+  .page-head p{font-size:15px;margin-top:12px}
+  .section{padding:40px 0}
+  .wrap{padding:0 18px}
+  .subhead{margin:32px 0 16px}
+
+  .shero-in{padding-block:40px 36px;gap:26px}
+  .shero .lede{font-size:16px}
+  .band .b{padding:18px 14px}
+  .band .n{font-size:22px}
+
+  /* 표 → 카드 */
+  .tbl-wrap{overflow:visible;border:none;background:none;border-radius:0}
+  table.t{min-width:0;width:100%;display:block;font-size:14px}
+  table.t thead{display:none}
+  table.t tbody{display:block}
+  table.t tr{display:block;border:1px solid var(--line);border-radius:12px;background:var(--paper);
+    padding:13px 15px;margin-bottom:10px}
+  table.t tr:hover,table.t tbody tr:hover{background:var(--paper)}
+  table.t td{display:flex;gap:10px;align-items:flex-start;border:none;padding:4px 0;
+    font-size:14px;line-height:1.55}
+  table.t tr:last-child td{border:none}
+  table.t td::before{content:attr(data-l);flex:0 0 68px;font-family:var(--mono);font-size:10.5px;
+    letter-spacing:.06em;color:var(--muted);font-weight:700;padding-top:3px}
+  table.t td:not([data-l]){display:block}
+  table.t td:not([data-l])::before{content:none}
+  table.t td.c-name{display:block;padding:0 0 8px;border-bottom:1px solid var(--line);margin-bottom:8px}
+  table.t td.c-name .nm{font-size:16.5px}
+  table.t td.c-name .en{display:block;margin:2px 0 0;font-size:11.5px}
+  table.t td.syct{font-size:13px;white-space:normal;word-break:break-all}
+  table.t td.c-att{padding-top:10px}
+  table.t td.ckcell{align-items:center}
+  table.t td.ckcell::before{padding-top:0}
+
+  /* 구간 머리줄 */
+  table.t tr.grp{padding:8px 14px;margin:18px 0 10px;border-radius:8px}
+  table.t tr.grp td{display:block;padding:0;font-size:11.5px}
+  table.t tr.grp td::before{content:none}
+  table.t tr.g-phd,table.t tr.g-ms,table.t tr.g-cur,table.t tr.grp.g-off{border-left-width:4px}
+  table.t tr.g-phd{background:#edf3fa;border-color:#bcd4ec}
+  table.t tr.g-ms{background:#eaf4ef;border-color:#bcdccd}
+  table.t tr.g-cur{background:#faf5e9;border-color:#e4d8bd}
+  table.t tr.g-phd td,table.t tr.g-ms td,table.t tr.g-cur td,table.t tr.grp.g-off td{background:none;border-left:none}
+  table.t tr.r-phd td:first-child,table.t tr.r-ms td:first-child,table.t tr.r-cur td:first-child{box-shadow:none}
+  table.t tr.r-phd{border-left:4px solid #9cbfe3}
+  table.t tr.r-ms{border-left:4px solid #9ccbb7}
+  table.t tr.r-cur{border-left:4px solid #dcc389}
+  table.t tr.off{opacity:.72}
+
+  .seg{width:100%}
+  .seg button{flex:1 1 0;padding:9px 0;font-size:13px}
+  .sum{grid-template-columns:repeat(2,1fr);gap:10px}
+  .sumcell{padding:13px 14px}
+  .sumcell .v{font-size:25px}
+  .toolbar .count{margin-left:0;flex-basis:100%}
+  .toolbar #exp{flex:1 1 auto}
+  .month{padding:14px 12px 16px}
+  .cal{gap:3px}
+  .cal .day{min-height:58px;padding:4px 3px 3px}
+  .sychip{font-size:8.5px;padding:1.5px 3px}
+  .cal .day .num{font-size:10.5px}
+  .picker-hd{padding:12px 15px}
+  .pkrow{padding:10px 15px;flex-wrap:wrap}
+  .pkrow .dt{flex-basis:100%;padding-left:36px}
+  .ask{padding:13px 15px;font-size:13.5px}
+  .idea{padding:18px 18px}
+  .idea .no{font-size:24px;right:16px;top:13px}
+  .step p,.step .note{font-size:14px}
+}

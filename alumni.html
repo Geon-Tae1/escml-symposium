@@ -6,7 +6,7 @@
 <title>동문 명단 — 선양국 교수님 정년퇴임 기념 심포지엄</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="base.css?v=1">
-<link rel="stylesheet" href="styles.css?v=5">
+<link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body data-page="alumni">
 <div id="site-header"></div>
@@ -70,12 +70,12 @@
 
 </main>
 <div id="site-footer"></div>
-<script defer src="data.js?v=5"></script>
-<script defer src="app.js?v=5"></script>
+<script defer src="data.js?v=6"></script>
+<script defer src="app.js?v=6"></script>
 <script>
 window.addEventListener('DOMContentLoaded', function () {
   // 주의 — 화면을 가리는 장치일 뿐 실제 보안이 아닙니다.
-  var PASSCODE = '1749';
+  var PASSCODE = '1017';
   var KEY = 'escml_att';
 
   var D = window.SYM, el = window.SYMUI.el;
@@ -142,14 +142,14 @@ window.addEventListener('DOMContentLoaded', function () {
         }, [o[1]]));
       });
       tb.appendChild(el('tr', { class: 'r-' + R.k }, [
-        el('td', {}, [el('span', { class: 'nm' }, [p.name]), p.en ? el('span', { class: 'en' }, [p.en]) : null]),
-        el('td', {}, [el('span', { class: 'rk rk-' + R.k }, [p.deg || R.n])]),
-        el('td', { class: p.org ? '' : 'muted' }, [p.org || '미확인']),
-        el('td', { class: p.title ? '' : 'muted' }, [p.title || '']),
-        el('td', { class: 'syct ct-col' + (ct.tel ? '' : ' muted') }, [ct.tel || (open ? '—' : '')]),
-        el('td', { class: 'syct ct-col' + (ct.mail ? '' : ' muted') },
+        el('td', { class: 'c-name' }, [el('span', { class: 'nm' }, [p.name]), p.en ? el('span', { class: 'en' }, [p.en]) : null]),
+        el('td', { 'data-l': '과정' }, [el('span', { class: 'rk rk-' + R.k }, [p.deg || R.n])]),
+        el('td', { 'data-l': '소속', class: p.org ? '' : 'muted' }, [p.org || '미확인']),
+        el('td', { 'data-l': '직책', class: p.title ? '' : 'muted' }, [p.title || '—']),
+        el('td', { 'data-l': '휴대폰', class: 'syct ct-col' + (ct.tel ? '' : ' muted') }, [ct.tel || (open ? '—' : '')]),
+        el('td', { 'data-l': '이메일', class: 'syct ct-col' + (ct.mail ? '' : ' muted') },
           [ct.mail ? el('a', { href: 'mailto:' + ct.mail }, [ct.mail]) : (open ? '—' : '')]),
-        el('td', {}, [seg])
+        el('td', { 'data-l': '참석', class: 'c-att' }, [seg])
       ]));
     });
     document.getElementById('cnt').textContent = n + '명';
@@ -162,7 +162,7 @@ window.addEventListener('DOMContentLoaded', function () {
     try { sessionStorage.setItem('sym_ct', '1'); } catch (_) {}
     if (window.SYM_CONTACT) { rows(); return; }
     var s = document.createElement('script');
-    s.src = 'contacts.js?v=5';
+    s.src = 'contacts.js?v=6';
     s.onload = function () {
       try { window.SYM_CONTACT = JSON.parse(decodeURIComponent(escape(atob(window.SYM_CT_B64)))); }
       catch (_) { window.SYM_CONTACT = {}; }

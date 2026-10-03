@@ -6,7 +6,7 @@
 <title>2027년 1 · 2월 달력 — 선양국 교수님 정년퇴임 기념 심포지엄</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="base.css?v=1">
-<link rel="stylesheet" href="styles.css?v=5">
+<link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body data-page="calendar">
 <div id="site-header"></div>
@@ -80,8 +80,8 @@
 
 </main>
 <div id="site-footer"></div>
-<script defer src="data.js?v=5"></script>
-<script defer src="app.js?v=5"></script>
+<script defer src="data.js?v=6"></script>
+<script defer src="app.js?v=6"></script>
 <script>
 window.addEventListener('DOMContentLoaded', function () {
   var D = window.SYM, el = window.SYMUI.el, fmt = window.SYMUI.fmt;
@@ -217,13 +217,13 @@ window.addEventListener('DOMContentLoaded', function () {
       }
       n++;
       tb.appendChild(el('tr', { class: (s.cal ? 'can' : '') + (s.rel ? '' : ' off') }, [
-        el('td', { class: 'ckcell' }, [mkBox(s.id, !s.cal)]),
-        el('td', {}, [el('span', { class: 'sypill' }, [s.kind])]),
-        el('td', {}, [el('span', { class: 'nm' }, [s.name])]),
-        el('td', { class: s.when ? '' : 'muted' }, [s.when || '미공지']),
-        el('td', { class: s.where ? '' : 'muted' }, [s.where || '—']),
-        el('td', {}, [el('span', { class: 'sypill' + (String(s.conf).indexOf('확정') === 0 ? ' ok' : '') }, [s.conf])]),
-        el('td', { class: String(s.hit).indexOf('해당 없음') === 0 ? 'muted' : '' }, [s.hit])
+        el('td', { 'data-l': '달력', class: 'ckcell' }, [mkBox(s.id, !s.cal)]),
+        el('td', { 'data-l': '구분' }, [el('span', { class: 'sypill' }, [s.kind])]),
+        el('td', { class: 'c-name' }, [el('span', { class: 'nm' }, [s.name])]),
+        el('td', { 'data-l': '일정', class: s.when ? '' : 'muted' }, [s.when || '미공지']),
+        el('td', { 'data-l': '장소', class: s.where ? '' : 'muted' }, [s.where || '—']),
+        el('td', { 'data-l': '확인' }, [el('span', { class: 'sypill' + (String(s.conf).indexOf('확정') === 0 ? ' ok' : '') }, [s.conf])]),
+        el('td', { 'data-l': '1 · 2월 충돌', class: String(s.hit).indexOf('해당 없음') === 0 ? 'muted' : '' }, [s.hit])
       ]));
     });
     document.getElementById('c1').textContent = n + '곳';
@@ -245,10 +245,10 @@ window.addEventListener('DOMContentLoaded', function () {
     var tb = el('tbody', {});
     (o.items || []).forEach(function (it) {
       tb.appendChild(el('tr', { class: it.cal ? 'can' : '' }, [
-        el('td', { class: 'ckcell' }, [mkBox(it.id, !it.cal)]),
-        el('td', { class: 'syct' }, [it.when]),
-        el('td', {}, [it.what]),
-        el('td', {}, [el('span', { class: 'sypill' + (String(it.conf).indexOf('확정') === 0 ? ' ok' : '') }, [it.conf])])
+        el('td', { 'data-l': '달력', class: 'ckcell' }, [mkBox(it.id, !it.cal)]),
+        el('td', { 'data-l': '시기', class: 'syct' }, [it.when]),
+        el('td', { class: 'c-name' }, [it.what]),
+        el('td', { 'data-l': '확인' }, [el('span', { class: 'sypill' + (String(it.conf).indexOf('확정') === 0 ? ' ok' : '') }, [it.conf])])
       ]));
     });
     t.appendChild(tb); w.appendChild(t); card.appendChild(w); ob.appendChild(card);
