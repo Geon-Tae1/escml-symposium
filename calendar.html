@@ -6,7 +6,7 @@
 <title>2027년 1 · 2월 달력 — 선양국 교수님 정년퇴임 기념 심포지엄</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="base.css?v=1">
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body data-page="calendar">
 <div id="site-header"></div>
@@ -44,8 +44,8 @@
   <div class="subhead reveal">학회 일정</div>
   <p class="reveal" style="max-width:72ch;color:var(--ink-soft);margin:-6px 0 18px">
     국내외 학회 24곳을 조사했습니다. 결론부터 적자면 <b>1 · 2월에 열리는 국내 배터리 · 전기화학 학회는 없습니다.</b>
-    실제 걸림돌은 설 연휴, CES, 기업 4분기 실적발표, 대학 학위수여식입니다.
-    1 · 2월에 걸리는 학회만 체크할 수 있습니다.</p>
+    실제 걸림돌은 설 연휴와 대학 2월 학위수여식입니다.
+    1 · 2월에 걸리는 학회를 위로 올렸고, 그 아래는 참고용입니다.</p>
   <div class="toolbar reveal">
     <input type="search" id="q1" placeholder="학회 이름으로 찾기" aria-label="학회 검색">
     <select id="f-kind" aria-label="구분"><option value="">전체</option></select>
@@ -70,8 +70,8 @@
 
 </main>
 <div id="site-footer"></div>
-<script defer src="data.js?v=3"></script>
-<script defer src="app.js?v=3"></script>
+<script defer src="data.js?v=4"></script>
+<script defer src="app.js?v=4"></script>
 <script>
 window.addEventListener('DOMContentLoaded', function () {
   var D = window.SYM, el = window.SYMUI.el, fmt = window.SYMUI.fmt;
@@ -196,12 +196,17 @@ window.addEventListener('DOMContentLoaded', function () {
   kinds.forEach(function (k) { sel.appendChild(el('option', { value: k }, [k])); });
   var q = '', kind = '';
   function soc() {
-    var tb = document.getElementById('r1'); tb.innerHTML = ''; var n = 0;
+    var tb = document.getElementById('r1'); tb.innerHTML = ''; var n = 0, split = false;
     D.societies.forEach(function (s) {
       if (kind && s.kind !== kind) return;
       if (q && (s.name + ' ' + s.where).toLowerCase().indexOf(q.toLowerCase()) < 0) return;
+      if (!s.rel && !split) {
+        split = true;
+        tb.appendChild(el('tr', { class: 'grp g-off' },
+          [el('td', { colspan: '7' }, ['1 · 2월과 무관한 학회 — 참고용'])]));
+      }
       n++;
-      tb.appendChild(el('tr', { class: s.cal ? 'can' : '' }, [
+      tb.appendChild(el('tr', { class: (s.cal ? 'can' : '') + (s.rel ? '' : ' off') }, [
         el('td', { class: 'ckcell' }, [mkBox(s.id, !s.cal)]),
         el('td', {}, [el('span', { class: 'sypill' }, [s.kind])]),
         el('td', {}, [el('span', { class: 'nm' }, [s.name])]),
