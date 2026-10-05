@@ -227,6 +227,23 @@ tr.grp td{background:var(--sym-soft);font-family:var(--mono);font-size:11px;lett
 :root[data-theme="dark"] .sumcell.a-m .v{color:#dcb35c}
 :root[data-theme="dark"] .sumcell.a-n .v{color:#e79287}
 
+/* ---------- 연락처 확인 진행 ----------
+   오래된 번호·주소를 한 사람씩 짚어 가며 확인하는 작업이라
+   몇 명을 끝냈고 몇 명이 남았는지가 바로 보여야 한다. */
+.ckbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid var(--line);
+  border-radius:12px;background:var(--paper);padding:13px 18px;margin:0 0 24px}
+.ckbar .k{font-family:var(--mono);font-size:11px;letter-spacing:.11em;color:var(--muted);
+  font-weight:700;white-space:nowrap}
+.ckbar .track{flex:1 1 180px;min-width:120px;height:7px;border-radius:999px;
+  background:var(--wash);border:1px solid var(--line);overflow:hidden}
+.ckbar .fill{height:100%;background:var(--sym);border-radius:999px;transition:width .25s ease}
+.ckbar .n{font-family:var(--mono);font-size:13px;color:var(--muted);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.ckbar .n b{font-size:15px;color:var(--sym-deep);font-weight:700}
+:root[data-theme="dark"] .ckbar .n b{color:var(--sym)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ckbar .n b{color:var(--sym)}}
+table.t tr.ckd td.ckcell{background:var(--sym-soft)}
+
 /* ---------- 과정 구분 (박사 / 석사 / 재학생) ---------- */
 .rk{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;font-weight:700;
   padding:3px 9px;border-radius:999px;white-space:nowrap;border:1px solid transparent}

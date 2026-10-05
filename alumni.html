@@ -6,7 +6,7 @@
 <title>동문 명단 — 선양국 교수님 정년퇴임 기념 심포지엄</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="base.css?v=1">
-<link rel="stylesheet" href="styles.css?v=8">
+<link rel="stylesheet" href="styles.css?v=9">
 </head>
 <body data-page="alumni">
 <div id="site-header"></div>
@@ -16,12 +16,15 @@
   <div class="eyebrow">동문 명단</div>
   <h1>연구실을 거쳐 간 사람들</h1>
   <p>박사 → 석사 → 재학생 순입니다. 참석 여부를 눌러 표시하면 위쪽 집계에 바로 반영됩니다.
-     바뀐 소속이나 연락처, 빠진 분이 있으면 알려 주시면 고치겠습니다.</p>
+     번호나 주소가 지금도 맞는지 한 사람씩 짚어 가며 <b>연락처 확인</b> 칸에 체크해 두면
+     어디까지 했는지 바로 보입니다. 바뀐 소속이나 연락처, 빠진 분이 있으면 알려 주시면 고치겠습니다.</p>
 </div></div>
 
 <section class="section"><div class="wrap">
 
   <div class="sum" id="sum"></div>
+
+  <div class="ckbar" id="ckbar"></div>
 
   <div class="ask reveal">
     바뀐 <b>소속 · 직책 · 연락처</b>나 빠진 분이 있으면 알려 주십시오. 바로 고치겠습니다.
@@ -49,6 +52,9 @@
     <select id="f-att" aria-label="참석 여부">
       <option value="">참석 전체</option><option value="y">참석</option><option value="m">미정</option><option value="n">불참</option><option value="-">미회신</option>
     </select>
+    <select id="f-ck" aria-label="연락처 확인 여부">
+      <option value="">연락처 전체</option><option value="y">확인함</option><option value="n">확인 안 함</option>
+    </select>
     <button class="btn btn-ghost btn-sm" id="exp" type="button">회신 결과 내려받기</button>
     <span class="count" id="cnt"></span>
   </div>
@@ -58,25 +64,27 @@
       <thead><tr>
         <th style="width:136px">이름</th><th style="width:72px">과정</th><th style="width:150px">소속</th><th style="width:92px">직책</th>
         <th class="ct-col" style="width:124px">휴대폰</th><th class="ct-col">이메일</th>
+        <th style="width:92px">연락처 확인</th>
         <th style="width:184px">참석</th>
       </tr></thead>
       <tbody id="rows"></tbody>
     </table>
   </div>
-  <p class="srcnote reveal">참석 표시는 이 브라우저에만 저장됩니다. 다른 기기에서 보려면 「회신 결과 내려받기」로 파일을 받아 두십시오.
+  <p class="srcnote reveal">참석 표시와 연락처 확인 표시는 이 브라우저에만 저장됩니다. 다른 기기에서 보려면 「회신 결과 내려받기」로 파일을 받아 두십시오.
     출처 — 연구실 연락처 명부와 ESCML 홈페이지. 두 자료가 다를 때는 명부를 우선했습니다.</p>
 
 </div></section>
 
 </main>
 <div id="site-footer"></div>
-<script defer src="data.js?v=8"></script>
-<script defer src="app.js?v=8"></script>
+<script defer src="data.js?v=9"></script>
+<script defer src="app.js?v=9"></script>
 <script>
 window.addEventListener('DOMContentLoaded', function () {
   // 주의 — 화면을 가리는 장치일 뿐 실제 보안이 아닙니다.
   var PASSCODE = '1017';
   var KEY = 'escml_att';
+  var CKEY = 'escml_ctok';   // 연락처를 직접 확인한 사람
 
   var D = window.SYM, el = window.SYMUI.el;
   if (!D) return;
@@ -85,11 +93,15 @@ window.addEventListener('DOMContentLoaded', function () {
   function gkey(p) { return p.rank === 2 ? '2-' + (p.sub || 0) : String(p.rank); }
   function gname(p) { return p.rank === 2 ? SUB[p.sub || 0] : RANK[p.rank].n; }
   var ATT = [['y', '참석'], ['m', '미정'], ['n', '불참']];
-  var open = false, q = '', rank = '', att = '';
+  var open = false, q = '', rank = '', att = '', ckf = '';
 
   var S = {};
   try { S = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (_) { S = {}; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (_) {} }
+
+  var C = {};
+  try { C = JSON.parse(localStorage.getItem(CKEY) || '{}'); } catch (_) { C = {}; }
+  function csave() { try { localStorage.setItem(CKEY, JSON.stringify(C)); } catch (_) {} }
 
   function summary() {
     var c = { y: 0, m: 0, n: 0 };
@@ -105,6 +117,20 @@ window.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  function ckbar() {
+    var n = 0;
+    D.people.forEach(function (p) { if (C[p.id]) n++; });
+    var tot = D.people.length;
+    var pc = tot ? Math.round(n * 100 / tot) : 0;
+    var box = document.getElementById('ckbar');
+    box.innerHTML = '';
+    box.appendChild(el('div', { class: 'k' }, ['연락처 확인']));
+    box.appendChild(el('div', { class: 'track' }, [el('div', { class: 'fill', style: 'width:' + pc + '%' })]));
+    box.appendChild(el('div', { class: 'n' }, [
+      el('b', {}, [String(n)]), ' / ' + tot + '명  ·  남은 ' + (tot - n) + '명'
+    ]));
+  }
+
   function ctCols(on) {
     document.querySelectorAll('.ct-col').forEach(function (n) { n.style.display = on ? '' : 'none'; });
   }
@@ -115,6 +141,7 @@ window.addEventListener('DOMContentLoaded', function () {
     var list = D.people.filter(function (p) {
       if (rank !== '' && String(p.rank) !== rank) return false;
       if (att) { var a = S[p.id] || '-'; if (a !== att) return false; }
+      if (ckf) { if ((C[p.id] ? 'y' : 'n') !== ckf) return false; }
       if (!q) return true;
       return (p.name + ' ' + (p.en || '') + ' ' + (p.org || '') + ' ' + (p.title || ''))
         .toLowerCase().indexOf(q.toLowerCase()) >= 0;
@@ -125,7 +152,7 @@ window.addEventListener('DOMContentLoaded', function () {
       var gk = gkey(p);
       if (gk !== last) {
         last = gk;
-        tb.appendChild(el('tr', { class: 'grp g-' + R.k }, [el('td', { colspan: '7' }, [gname(p)])]));
+        tb.appendChild(el('tr', { class: 'grp g-' + R.k }, [el('td', { colspan: '8' }, [gname(p)])]));
       }
       n++;
       var ct = (open && window.SYM_CONTACT) ? (window.SYM_CONTACT[p.id] || {}) : {};
@@ -141,7 +168,19 @@ window.addEventListener('DOMContentLoaded', function () {
           }
         }, [o[1]]));
       });
-      tb.appendChild(el('tr', { class: 'r-' + R.k }, [
+      var box = el('input', {
+        type: 'checkbox', class: 'calbox',
+        'aria-label': p.name + ' 연락처 확인함'
+      });
+      box.checked = !!C[p.id];
+      box.addEventListener('change', function () {
+        if (box.checked) C[p.id] = 1; else delete C[p.id];
+        csave(); ckbar();
+        tr.classList.toggle('ckd', box.checked);
+        if (ckf) rows();            // 확인 여부로 거르는 중이면 목록을 다시 그린다
+      });
+
+      var tr = el('tr', { class: 'r-' + R.k + (C[p.id] ? ' ckd' : '') }, [
         el('td', { class: 'c-name' }, [el('span', { class: 'nm' }, [p.name]), p.en ? el('span', { class: 'en' }, [p.en]) : null]),
         el('td', { 'data-l': '과정' }, [el('span', { class: 'rk rk-' + R.k }, [p.deg || R.n])]),
         el('td', { 'data-l': '소속', class: p.org ? '' : 'muted' }, [p.org || '미확인']),
@@ -152,8 +191,10 @@ window.addEventListener('DOMContentLoaded', function () {
         el('td', { 'data-l': '이메일', 'data-empty': ct.mail ? null : '1',
           class: 'syct ct-col' + (ct.mail ? '' : ' muted') },
           [ct.mail ? el('a', { href: 'mailto:' + ct.mail }, [ct.mail]) : (open ? '—' : '')]),
+        el('td', { 'data-l': '확인', class: 'ckcell' }, [box]),
         el('td', { 'data-l': '참석', class: 'c-att' }, [seg])
-      ]));
+      ]);
+      tb.appendChild(tr);
     });
     document.getElementById('cnt').textContent = n + '명';
     ctCols(open);
@@ -165,7 +206,7 @@ window.addEventListener('DOMContentLoaded', function () {
     try { sessionStorage.setItem('sym_ct', '1'); } catch (_) {}
     if (window.SYM_CONTACT) { rows(); return; }
     var s = document.createElement('script');
-    s.src = 'contacts.js?v=8';
+    s.src = 'contacts.js?v=9';
     s.onload = function () {
       try { window.SYM_CONTACT = JSON.parse(decodeURIComponent(escape(atob(window.SYM_CT_B64)))); }
       catch (_) { window.SYM_CONTACT = {}; }
@@ -184,13 +225,15 @@ window.addEventListener('DOMContentLoaded', function () {
   document.getElementById('q').addEventListener('input', function (e) { q = e.target.value; rows(); });
   document.getElementById('f-rank').addEventListener('change', function (e) { rank = e.target.value; rows(); });
   document.getElementById('f-att').addEventListener('change', function (e) { att = e.target.value; rows(); });
+  document.getElementById('f-ck').addEventListener('change', function (e) { ckf = e.target.value; rows(); });
 
   document.getElementById('exp').addEventListener('click', function () {
     var NM = { y: '참석', m: '미정', n: '불참' };
-    var out = ['이름,과정,소속,직책,참석여부'];
+    var out = ['이름,과정,소속,직책,참석여부,연락처확인'];
     D.people.forEach(function (p) {
       out.push(['"' + p.name + '"', '"' + (p.deg || '') + '"', '"' + (p.org || '') + '"',
-        '"' + (p.title || '') + '"', '"' + (NM[S[p.id]] || '미회신') + '"'].join(','));
+        '"' + (p.title || '') + '"', '"' + (NM[S[p.id]] || '미회신') + '"',
+        '"' + (C[p.id] ? '확인함' : '미확인') + '"'].join(','));
     });
     var blob = new Blob(['﻿' + out.join('\n')], { type: 'text/csv;charset=utf-8' });
     var a = document.createElement('a');
@@ -199,7 +242,7 @@ window.addEventListener('DOMContentLoaded', function () {
     a.click(); URL.revokeObjectURL(a.href);
   });
 
-  summary(); rows();
+  summary(); ckbar(); rows();
   try { if (sessionStorage.getItem('sym_ct') === '1') unlock(); } catch (_) {}
 });
 </script>
