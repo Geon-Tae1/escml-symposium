@@ -26,6 +26,8 @@
 
   <div class="ckbar" id="ckbar"></div>
 
+  <div class="sync" id="sync"></div>
+
   <div class="ask reveal">
     바뀐 <b>소속 · 직책 · 연락처</b>나 빠진 분이 있으면 알려 주십시오. 바로 고치겠습니다.
     &nbsp;—&nbsp; <a href="mailto:gtpark1@hanyang.ac.kr?subject=%EB%8F%99%EB%AC%B8%20%EB%AA%85%EB%8B%A8%20%EC%A0%95%EC%A0%95">gtpark1@hanyang.ac.kr</a> (한양대학교 박건태 교수)
@@ -70,7 +72,7 @@
       <tbody id="rows"></tbody>
     </table>
   </div>
-  <p class="srcnote reveal">참석 표시와 연락처 확인 표시는 이 브라우저에만 저장됩니다. 다른 기기에서 보려면 「회신 결과 내려받기」로 파일을 받아 두십시오.
+  <p class="srcnote reveal">참석 표시와 연락처 확인 표시는 위쪽에서 기기 간 저장을 켜 두면 교수님 계정의 비공개 Gist 에 저장되고, 꺼 두면 이 브라우저에만 남습니다.
     출처 — 연구실 연락처 명부와 ESCML 홈페이지. 두 자료가 다를 때는 명부를 우선했습니다.</p>
 
 </div></section>
@@ -79,6 +81,7 @@
 <div id="site-footer"></div>
 <script defer src="data.js?v=9"></script>
 <script defer src="app.js?v=9"></script>
+<script defer src="sync.js?v=9"></script>
 <script>
 window.addEventListener('DOMContentLoaded', function () {
   // 주의 — 화면을 가리는 장치일 뿐 실제 보안이 아닙니다.
@@ -97,11 +100,17 @@ window.addEventListener('DOMContentLoaded', function () {
 
   var S = {};
   try { S = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (_) { S = {}; }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (_) {} }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (_) {}
+    if (window.SYMSYNC) window.SYMSYNC.push();
+  }
 
   var C = {};
   try { C = JSON.parse(localStorage.getItem(CKEY) || '{}'); } catch (_) { C = {}; }
-  function csave() { try { localStorage.setItem(CKEY, JSON.stringify(C)); } catch (_) {} }
+  function csave() {
+    try { localStorage.setItem(CKEY, JSON.stringify(C)); } catch (_) {}
+    if (window.SYMSYNC) window.SYMSYNC.push();
+  }
 
   function summary() {
     var c = { y: 0, m: 0, n: 0 };
@@ -243,6 +252,17 @@ window.addEventListener('DOMContentLoaded', function () {
   });
 
   summary(); ckbar(); rows();
+
+  if (window.SYMSYNC) {
+    window.SYMSYNC.bind(function () {           // 원격 기록을 받아 왔을 때 화면을 다시 그린다
+      try { S = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (_) { S = {}; }
+      try { C = JSON.parse(localStorage.getItem(CKEY) || '{}'); } catch (_) { C = {}; }
+      summary(); ckbar(); rows();
+    });
+    window.SYMSYNC.mount('sync');
+    window.SYMSYNC.start();
+  }
+
   try { if (sessionStorage.getItem('sym_ct') === '1') unlock(); } catch (_) {}
 });
 </script>

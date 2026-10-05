@@ -21,6 +21,8 @@
 
 <section class="section"><div class="wrap">
 
+  <div class="sync" id="sync"></div>
+
   <div class="ask reveal">
     달력에 올려야 할 <b>다른 주요 일정</b>이 있으면 알려 주십시오. 바로 반영하겠습니다.
     &nbsp;—&nbsp; <a href="mailto:gtpark1@hanyang.ac.kr?subject=%ED%87%B4%EC%9E%84%20%EC%8B%AC%ED%8F%AC%EC%A7%80%EC%97%84%20%EC%9D%BC%EC%A0%95%20%EC%A0%9C%EB%B3%B4">gtpark1@hanyang.ac.kr</a> (한양대학교 박건태 교수)
@@ -82,6 +84,7 @@
 <div id="site-footer"></div>
 <script defer src="data.js?v=9"></script>
 <script defer src="app.js?v=9"></script>
+<script defer src="sync.js?v=9"></script>
 <script>
 window.addEventListener('DOMContentLoaded', function () {
   var D = window.SYM, el = window.SYMUI.el, fmt = window.SYMUI.fmt;
@@ -92,7 +95,10 @@ window.addEventListener('DOMContentLoaded', function () {
   var on = null;
   try { on = JSON.parse(localStorage.getItem(KEY)); } catch (_) {}
   if (!Array.isArray(on)) on = DEFAULT.slice();
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(on)); } catch (_) {} }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(on)); } catch (_) {}
+    if (window.SYMSYNC) window.SYMSYNC.push();
+  }
   function has(id) { return on.indexOf(id) >= 0; }
   function toggle(id, v) {
     var i = on.indexOf(id);
@@ -255,6 +261,14 @@ window.addEventListener('DOMContentLoaded', function () {
   });
 
   draw();
+
+  if (window.SYMSYNC) {
+    /* 체크 상자가 표와 고르기 칸 양쪽에 흩어져 있어, 받아 온 기록을 일일이
+       되짚기보다 한 번 새로 그리는 편이 확실하다. 처음 열 때 많아야 한 번 돈다. */
+    window.SYMSYNC.bind(function () { location.reload(); });
+    window.SYMSYNC.mount('sync');
+    window.SYMSYNC.start();
+  }
 });
 </script>
 </body>
